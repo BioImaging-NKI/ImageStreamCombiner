@@ -1,0 +1,40 @@
+[build-system]
+requires = ["setuptools>=65.0.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "combine_imagestream_files"
+version = "1.0.0"
+description = "combine imagestream files"
+readme = "readme.md"
+authors = [{ name = "Rolf Harkes", email = "r.harkes@nki.nl" }]
+classifiers = [
+    "License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3",
+]
+keywords = ["ImageStream"]
+dependencies = [
+    "pandas",
+    "tifffile",
+    "odfpy",
+    "tqdm",
+    "numpy",
+]
+requires-python = ">=3.11"
+[project.optional-dependencies]
+dev = ["black", "mypy", "setuptools", "build", "twine"]
+
+[tool.black]
+line-length = 88
+target-version = ['py39', 'py310', 'py311']
+
+[tool.pytest.ini_options]
+pythonpath = [
+  "."
+]
+
+[tool.mypy]
+python_version = '3.11'
+packages = "combine_imagestream_files"
+strict = true
