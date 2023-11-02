@@ -128,7 +128,7 @@ for folder in zipfile["datasets"]:
             "spacing": pixelsize,
             "unit": "um",
             "axes": "TCYX",
-            "Labels": channelnames*data["dataset"].shape[0],
+            "Labels": channelnames * data["dataset"].shape[0],
             "Ranges": [ranges],
             "Properties": {"Medians": medians_str},
         },
