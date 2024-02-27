@@ -16,15 +16,14 @@ classifiers = [
 keywords = ["ImageStream"]
 dependencies = [
     "pandas",
-    "pandas-stubs",
     "tifffile",
     "odfpy",
-    "tqdm",
     "numpy",
 ]
 requires-python = ">=3.11"
 [project.optional-dependencies]
-dev = ["black", "mypy", "setuptools", "build", "twine"]
+dev = ["black", "mypy", "pytest", "bumpver", "pandas-stubs"]
+ui = ["PyQt6"]
 
 [tool.black]
 line-length = 88
