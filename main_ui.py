@@ -6,7 +6,7 @@ from ui import mainwidget
 from combine_imagestream_files import processzip
 
 
-class ImageXpressConverter(qtw.QMainWindow):
+class ImageStreamCombiner(qtw.QMainWindow):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.setWindowTitle("ImageStream Combiner")
@@ -49,7 +49,7 @@ class MainWidget(qtw.QWidget, logging.Handler):
 
 def main():
     app = qtw.QApplication(sys.argv)
-    main_program = ImageXpressConverter()
+    main_program = ImageStreamCombiner()
     main_program.show()
     sys.exit(app.exec())
 
