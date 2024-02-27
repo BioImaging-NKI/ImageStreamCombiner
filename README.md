@@ -1,2 +1,4 @@
-# ImageStream
-Scripts for ImageStream analysis
+# Combine ImageStream Files
+
+## Installation
+`pip install -e .`
