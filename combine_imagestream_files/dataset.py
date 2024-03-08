@@ -1,3 +1,5 @@
+from typing import Any
+
 import numpy as np
 
 
@@ -8,7 +10,7 @@ class DataSet:
         self.channelnames: list[str] = []  # name for each channel
         self.medians: list[int] = []  # median for each channel
         self.size = (0, 0)  # max width and max height
-        self.datatype = np.uint8
+        self.datatype: np.dtype[Any]
 
     def __str__(self) -> str:
         return self.name
@@ -16,15 +18,17 @@ class DataSet:
     def setchannelnames(self, channelnames: list[str]) -> None:
         self.channelnames = channelnames
 
-    def addchannelname(self, idx, name):
+    def addchannelname(self, idx: int, name: str) -> None:
         if len(self.channelnames) <= idx:
-            self.channelnames.extend('' for _ in range(idx - len(self.channelnames)+1))
+            self.channelnames.extend(
+                "" for _ in range(idx - len(self.channelnames) + 1)
+            )
         self.channelnames[idx] = name
 
     def addfile(self, file: str) -> None:
         nparts = file.split("_")
         ch = int(nparts[-1][2::])  # Ch1 Ch11
-        self.addchannelname(ch - 1, f'--')
+        self.addchannelname(ch - 1, f"--")
         stem = "_".join(nparts[0:-1])
         if stem in self.groupedfiles:
             self.groupedfiles[stem].append(ch)

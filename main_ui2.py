@@ -33,7 +33,7 @@ class MyMainWidget(QtW.QWidget, logging.Handler):
         self.logger = logging.getLogger(__name__)
         self.logger.addHandler(self)
         self.logger.setLevel(logging.INFO)
-        self.current_dir = Path(r'c:\Temp\Sofia')
+        self.current_dir = Path(r"c:\Temp\Sofia")
         self.ui.pb_run.clicked.connect(self.run)
         self.ui.pb_choosezipfile.clicked.connect(self.setin)
         self.ui.lw_datasets.itemClicked.connect(self.datasetclicked)
@@ -54,14 +54,19 @@ class MyMainWidget(QtW.QWidget, logging.Handler):
     def save(self):
         if not self.isz:
             return
-        currentdataset = self.ui.lw_datasets.item(self.ui.lw_datasets.currentRow()).data(256)
+        currentdataset = self.ui.lw_datasets.item(
+            self.ui.lw_datasets.currentRow()
+        ).data(256)
         defaultfile = Path(self.current_dir, f"{currentdataset}.toml")
         file = QtW.QFileDialog.getSaveFileName(
-            self, "Save Channel File", str(defaultfile), "*.toml",
+            self,
+            "Save Channel File",
+            str(defaultfile),
+            "*.toml",
         )
         if file[0]:
-            tomldata = {'channelnames': currentdataset.channelnames[:]}
-            with open(file[0], 'w') as f:
+            tomldata = {"channelnames": currentdataset.channelnames[:]}
+            with open(file[0], "w") as f:
                 toml.dump(tomldata, f)
 
     def load(self):
@@ -72,16 +77,22 @@ class MyMainWidget(QtW.QWidget, logging.Handler):
         )
         pth = Path(file[0])
         if pth.exists():
-            currentdataset = self.ui.lw_datasets.item(self.ui.lw_datasets.currentRow()).data(256)
-            with open(pth, 'r') as f:
+            currentdataset = self.ui.lw_datasets.item(
+                self.ui.lw_datasets.currentRow()
+            ).data(256)
+            with open(pth, "r") as f:
                 channelnames = toml.load(f)
-            currentdataset.channelnames = channelnames['channelnames']
-            self.datasetclicked(self.ui.lw_datasets.item(self.ui.lw_datasets.currentRow()))
+            currentdataset.channelnames = channelnames["channelnames"]
+            self.datasetclicked(
+                self.ui.lw_datasets.item(self.ui.lw_datasets.currentRow())
+            )
 
     def toallchannels(self):
         if not self.isz:
             return
-        currentdataset = self.ui.lw_datasets.item(self.ui.lw_datasets.currentRow()).data(256)
+        currentdataset = self.ui.lw_datasets.item(
+            self.ui.lw_datasets.currentRow()
+        ).data(256)
         for ds_name in self.isz.datasets:
             self.isz.datasets[ds_name].channelnames = currentdataset.channelnames[:]
 
@@ -101,12 +112,14 @@ class MyMainWidget(QtW.QWidget, logging.Handler):
     def channelchanged(self, item: QtW.QListWidgetItem):
         if not self.isz:
             return
-        currentdataset = self.ui.lw_datasets.item(self.ui.lw_datasets.currentRow()).data(256)
+        currentdataset = self.ui.lw_datasets.item(
+            self.ui.lw_datasets.currentRow()
+        ).data(256)
         channelindex = self.ui.lw_channels.currentRow()
         if item.text():
             currentdataset.channelnames[channelindex] = item.text()
         else:
-            currentdataset.channelnames[channelindex] = '--'
+            currentdataset.channelnames[channelindex] = "--"
 
     def setin(self):
         file = QtW.QFileDialog.getOpenFileName(
@@ -121,7 +134,8 @@ class MyMainWidget(QtW.QWidget, logging.Handler):
             self.ui.l_filein.setText(str(self.isz))
             for x in self.isz.datasets.keys():
                 newitem = QtW.QListWidgetItem(
-                    f"{x} : ({len(self.isz.datasets[x].groupedfiles)} cells {self.isz.datasets[x].getnchannels()} channels)")
+                    f"{x} : ({len(self.isz.datasets[x].groupedfiles)} cells {self.isz.datasets[x].getnchannels()} channels)"
+                )
                 newitem.setData(256, self.isz.datasets[x])
                 self.ui.lw_datasets.addItem(newitem)
             self.ui.lw_datasets.sortItems()

@@ -29,13 +29,13 @@ class ImageStreamZip:
                         if folder not in self.datasets:
                             self.datasets[folder] = DataSet(folder)
                         self.datasets[folder].addfile(
-                            name[0: len(name) - len(self.suffix)]
+                            name[0 : len(name) - len(self.suffix)]
                         )
             for d in self.datasets:
                 self.datasets[d].sort()
             self.loaded = True
 
-    def writetiffs(self, folder: Path | str, pixelsize: float):
+    def writetiffs(self, folder: Path | str, pixelsize: float) -> None:
         self.getinfos()
         with ZipFile(self.zipfile, "r") as archive:
             for datasetname in self.datasets:
@@ -55,7 +55,7 @@ class ImageStreamZip:
                 for i, file in enumerate(dataset.groupedfiles):
                     for j, channel in enumerate(dataset.groupedfiles[file]):
                         with TiffFile(
-                                archive.open(f"{dataset}/{file}_Ch{channel}{self.suffix}")
+                            archive.open(f"{dataset}/{file}_Ch{channel}{self.suffix}")
                         ) as tfile:
                             page = tfile.pages[0]
                             data[i, j, :, :] = dataset.medians[j]
@@ -63,7 +63,9 @@ class ImageStreamZip:
                             h = page.shape[1]
                             offsetx = (dataset.size[0] - w) // 2
                             offsety = (dataset.size[1] - h) // 2
-                            data[i, j, offsetx: offsetx + w, offsety: offsety + h] = page.asarray()
+                            data[i, j, offsetx : offsetx + w, offsety : offsety + h] = (
+                                page.asarray()
+                            )
 
                 # find ranges for each channel
                 ranges = []
@@ -104,7 +106,7 @@ class ImageStreamZip:
                 for i, file in enumerate(dataset.groupedfiles):
                     for j, channel in enumerate(dataset.groupedfiles[file]):
                         with TiffFile(
-                                archive.open(f"{dataset}/{file}_Ch{channel}{self.suffix}")
+                            archive.open(f"{dataset}/{file}_Ch{channel}{self.suffix}")
                         ) as tfile:
                             page = tfile.pages[0]
                             if checkdatatype:
