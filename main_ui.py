@@ -27,12 +27,12 @@ class MainWidget(qtw.QWidget, logging.Handler):
         self.ui.setupUi(self)
         self.ui.run_btn.clicked.connect(self.run)
         self.ui.in_btn.clicked.connect(self.setin)
-        self.pth_in = Path('')
+        self.pth_in = Path("")
 
     def run(self):
-        self.ui.log_txt.appendPlainText('Starting converting files...')
+        self.ui.log_txt.appendPlainText("Starting converting files...")
         processzip(self.pth_in)
-        self.ui.log_txt.appendPlainText('Finished converting')
+        self.ui.log_txt.appendPlainText("Finished converting")
 
     def setin(self):
         file = qtw.QFileDialog.getOpenFileName(self, "Set Zip File", "", "*.zip")
@@ -54,5 +54,5 @@ def main():
     sys.exit(app.exec())
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

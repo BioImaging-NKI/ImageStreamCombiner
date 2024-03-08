@@ -1,1 +1,1 @@
-from .form import Ui_Form as mainwidget
+from .form import Ui_Form as MainWidget

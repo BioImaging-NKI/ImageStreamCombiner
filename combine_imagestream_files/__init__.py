@@ -1,1 +1,1 @@
-from .processzip import processzip
+from .imagestreamzip import ImageStreamZip
