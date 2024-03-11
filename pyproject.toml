@@ -17,12 +17,11 @@ keywords = ["ImageStream"]
 dependencies = [
     "pandas",
     "tifffile",
-    "odfpy",
     "numpy",
 ]
 requires-python = ">=3.11"
 [project.optional-dependencies]
-dev = ["black", "mypy", "pytest", "bumpver", "pandas-stubs"]
+dev = ["black", "mypy", "pytest", "bumpver", "pandas-stubs", "pyinstaller"]
 ui = ["PyQt6"]
 
 [tool.black]

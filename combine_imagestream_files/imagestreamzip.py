@@ -16,6 +16,9 @@ class ImageStreamZip:
     def __bool__(self) -> bool:
         return self.loaded
 
+    def __str__(self) -> str:
+        return self.zipfile.stem
+
     def loadfile(self, zipfile: Path | str) -> None:
         self.zipfile = Path(zipfile)
         self.datasets = {}
@@ -35,27 +38,65 @@ class ImageStreamZip:
                 self.datasets[d].sort()
             self.loaded = True
 
-    def writetiffs(self, folder: Path | str, pixelsize: float) -> None:
-        self.getinfos()
+    def writetiffs(
+        self,
+        folder: Path | str,
+        pixelsize: float,
+        logger: logging.Logger = logging.getLogger("isz"),
+    ) -> None:
+        logger.info(f"Writing tiffile for {self}")
         with ZipFile(self.zipfile, "r") as archive:
             for datasetname in self.datasets:
+                logger.info(f"Writing tiffile for {datasetname}")
                 dataset = self.datasets[datasetname]
+                channels = dataset.getvalidchannels()
+                if len(channels) == 0:
+                    continue
+                # Getting Median/Size/datatype
+                mw = 0
+                mh = 0
+                medians = np.zeros(
+                    (len(dataset.groupedfiles), len(channels)),
+                    dtype=float,
+                )
+                logging.getLogger("tifffile").setLevel(
+                    logging.ERROR
+                )  # otherwise you get many "FILLORDER" errors.
+                checkdatatype = True
+                for i, file in enumerate(dataset.groupedfiles):  # Each cell
+                    for j, channel in enumerate(channels):  # Each channel
+                        with TiffFile(
+                                archive.open(f"{dataset}/{file}_Ch{channel.index}{self.suffix}")
+                        ) as tfile:
+                            page = tfile.pages[0]
+                            if checkdatatype:
+                                dataset.datatype = page.asarray().dtype
+                                checkdatatype = False
+                            if page.shape[0] > mw:
+                                mw = page.shape[0]
+                            if page.shape[1] > mh:
+                                mh = page.shape[1]
+                            medians[i, j] = np.median(page.asarray())
+                dataset.medians = np.median(medians, axis=0)
+                dataset.size = (mw, mh)
+
+                # Writing Tiff
                 outpth = Path(folder, f"{dataset}.tif")
                 outpth.parent.mkdir(parents=True, exist_ok=True)
 
                 data = np.zeros(
                     (
                         len(dataset.groupedfiles),
-                        dataset.getnchannels(),
+                        dataset.getnvalidchannels(),
                         dataset.size[0],
                         dataset.size[1],
                     ),
                     dtype=dataset.datatype,
                 )
                 for i, file in enumerate(dataset.groupedfiles):
-                    for j, channel in enumerate(dataset.groupedfiles[file]):
+                    for j, channel in enumerate(channels):
                         with TiffFile(
-                            archive.open(f"{dataset}/{file}_Ch{channel}{self.suffix}")
+                            archive.open(f"{dataset}/{file}_Ch{channel.index}{self.suffix}")
                         ) as tfile:
                             page = tfile.pages[0]
                             data[i, j, :, :] = dataset.medians[j]
@@ -73,6 +114,7 @@ class ImageStreamZip:
                     ranges.append(dataset.medians[ch])
                     ranges.append(data[:, ch, :, :].max())
                 medians_str = "\n" + ",".join([str(int(x)) for x in dataset.medians])
+                channelnames = [str(x) for x in dataset.getvalidchannels()]
                 imwrite(
                     outpth,
                     data,
@@ -83,42 +125,8 @@ class ImageStreamZip:
                         "spacing": pixelsize,
                         "unit": "um",
                         "axes": "TCYX",
-                        "Labels": dataset.channelnames * len(dataset.groupedfiles),
+                        "Labels": channelnames * len(dataset.groupedfiles),
                         "Ranges": [ranges],
                         "Properties": {"Medians": medians_str},
                     },
                 )
-
-    def getinfos(self) -> None:
-        with ZipFile(self.zipfile, "r") as archive:
-            for datasetname in self.datasets:
-                dataset = self.datasets[datasetname]
-                mw = 0
-                mh = 0
-                medians = np.zeros(
-                    (len(dataset.groupedfiles), dataset.getnchannels()),
-                    dtype=float,
-                )
-                logging.getLogger("tifffile").setLevel(
-                    logging.ERROR
-                )  # otherwise you get many "FILLORDER" errors.
-                checkdatatype = True
-                for i, file in enumerate(dataset.groupedfiles):
-                    for j, channel in enumerate(dataset.groupedfiles[file]):
-                        with TiffFile(
-                            archive.open(f"{dataset}/{file}_Ch{channel}{self.suffix}")
-                        ) as tfile:
-                            page = tfile.pages[0]
-                            if checkdatatype:
-                                dataset.datatype = page.asarray().dtype
-                                checkdatatype = False
-                            if page.shape[0] > mw:
-                                mw = page.shape[0]
-                            if page.shape[1] > mh:
-                                mh = page.shape[1]
-                            medians[i, j] = np.median(page.asarray())
-                dataset.medians = np.median(medians, axis=0)
-                dataset.size = (mw, mh)
-
-    def __str__(self) -> str:
-        return str(self.zipfile)

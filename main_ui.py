@@ -4,9 +4,13 @@ from pathlib import Path
 from PyQt6 import QtWidgets as QtW
 from PyQt6 import QtCore as QtC
 import toml
+from PyQt6.QtCore import QSettings
+from PyQt6.QtGui import QDropEvent, QDragEnterEvent, QDragMoveEvent, QColor
+
 from combine_imagestream_files.dataset import DataSet
 from combine_imagestream_files.imagestreamzip import ImageStreamZip
 from ui import MainWidget
+from ui.customwidgets import QLogHandler, configure_logging
 
 
 class ImageStreamCombiner(QtW.QMainWindow):
@@ -14,42 +18,87 @@ class ImageStreamCombiner(QtW.QMainWindow):
         super().__init__(*args, **kwargs)
         self.setWindowTitle("ImageStream Combiner")
         self.mainwidget = MyMainWidget(self)
-        # self.resize(750, 400)
         self.setCentralWidget(self.mainwidget)
         self.logger = logging.getLogger(__name__)
-        self.logger.addHandler(self.mainwidget)
+        configure_logging(
+            handlers=[
+                logging.FileHandler("debug.log", mode="w"),
+                logging.StreamHandler(),
+                QLogHandler(self.mainwidget.ui.tel_logging),
+            ]
+        )
         self.logger.setLevel(logging.INFO)
+        self.settings = QSettings("NKI-AVL", "CombineImageStreamFiles")
         self.logger.info("ImageStream Combiner Initialized...")
+        self._restorestate()
+
+    def _restorestate(self):
+        if self.settings.value("geometry"):
+            self.restoreGeometry(self.settings.value("geometry"))
 
     def closeEvent(self, event):
-        self.logger.removeHandler(self.logger.handlers[0])
+        self.settings.setValue("geometry", self.saveGeometry())
 
 
-class MyMainWidget(QtW.QWidget, logging.Handler):
+class MyMainWidget(QtW.QWidget):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.ui = MainWidget()
         self.ui.setupUi(self)
         self.logger = logging.getLogger(__name__)
-        self.logger.addHandler(self)
+        configure_logging(
+            handlers=[
+                logging.FileHandler("debug.log", mode="w"),
+                logging.StreamHandler(),
+                QLogHandler(self.ui.tel_logging),
+            ]
+        )
         self.logger.setLevel(logging.INFO)
-        self.current_dir = Path(r"c:\Temp\Sofia")
+        self.settings = QSettings("NKI-AVL", "CombineImageStreamFiles")
+        self.current_dir = Path(Path.cwd())
         self.ui.pb_run.clicked.connect(self.run)
         self.ui.pb_choosezipfile.clicked.connect(self.setin)
         self.ui.lw_datasets.itemClicked.connect(self.datasetclicked)
         self.ui.lw_channels.itemChanged.connect(self.channelchanged)
-        self.ui.pb_toallchannels.clicked.connect(self.toallchannels)
+        self.ui.pb_toalldatasets.clicked.connect(self.toalldatasets)
         self.ui.pb_save.clicked.connect(self.save)
         self.ui.pb_load.clicked.connect(self.load)
         self.isz = ImageStreamZip()
+        self._restore_state()
         self.logger.info("Main widget initialized...")
+
+    def _restore_state(self):
+        if self.settings.value("current_dir"):
+            self.current_dir = Path(self.settings.value("current_dir"))
+
+    def _setcurrentdir(self, pth: Path):
+        self.current_dir = pth
+        self.settings.setValue("current_dir", str(pth))
+
+    def dragMoveEvent(self, event: QDragMoveEvent):
+        event.accept()
+
+    def dragEnterEvent(self, event: QDragEnterEvent):
+        event.acceptProposedAction()
+
+    def dropEvent(self, event: QDropEvent):
+        if event.mimeData().hasUrls():
+            urllist = event.mimeData().urls()
+            url = Path(str(urllist[0].toLocalFile()))
+            self.logger.info(f"Got: {url}")
+            if url.suffix == ".zip":
+                self._setin(url)
+            if url.suffix == ".toml":
+                self._load(url)
 
     def run(self):
         if not self.isz:
             return
-        self.logger.info("Starting converting files...")
-        self.isz.writetiffs(self.current_dir, float(self.ui.dsb_pixelsize.value()))
-        self.logger.info("Finished converting files...")
+        self.logger.info("Start saving tiff files...")
+        self.isz.writetiffs(
+            self.current_dir, float(self.ui.dsb_pixelsize.value()), self.logger
+        )
+        self.logger.info("Finished saving tiff files...")
 
     def save(self):
         if not self.isz:
@@ -65,36 +114,54 @@ class MyMainWidget(QtW.QWidget, logging.Handler):
             "*.toml",
         )
         if file[0]:
-            tomldata = {"channelnames": currentdataset.channelnames[:]}
+            tomldata = {"channelnames": [str(x) for x in currentdataset.channels]}
             with open(file[0], "w") as f:
                 toml.dump(tomldata, f)
 
     def load(self):
         if not self.isz:
+            self.logger.info("No Zipfile Loaded...")
+            return
+        if len(self.ui.lw_datasets.selectedItems()) == 0:
+            self.logger.info("No Dataset Selected...")
             return
         file = QtW.QFileDialog.getOpenFileName(
             self, "Load Channel File", str(self.current_dir), "*.toml"
         )
         pth = Path(file[0])
+        self._load(pth)
+
+    def _load(self, pth):
+        if not self.isz:
+            self.logger.info("No Zipfile Loaded...")
+            return
+        if len(self.ui.lw_datasets.selectedItems()) == 0:
+            self.logger.info("No Dataset Selected...")
+            return
         if pth.exists():
             currentdataset = self.ui.lw_datasets.item(
                 self.ui.lw_datasets.currentRow()
-            ).data(256)
+            ).data(
+                256
+            )  # type: DataSet
             with open(pth, "r") as f:
                 channelnames = toml.load(f)
-            currentdataset.channelnames = channelnames["channelnames"]
+            currentdataset.setchannels(channelnames["channelnames"][:])
             self.datasetclicked(
                 self.ui.lw_datasets.item(self.ui.lw_datasets.currentRow())
             )
+            self._setcurrentdir(pth.parent)
 
-    def toallchannels(self):
+    def toalldatasets(self):
         if not self.isz:
             return
         currentdataset = self.ui.lw_datasets.item(
             self.ui.lw_datasets.currentRow()
         ).data(256)
         for ds_name in self.isz.datasets:
-            self.isz.datasets[ds_name].channelnames = currentdataset.channelnames[:]
+            self.isz.datasets[ds_name].setchannels(
+                [str(x) for x in currentdataset.channels]
+            )
 
     def datasetclicked(self, item: QtW.QListWidgetItem):
         if not self.isz:
@@ -102,11 +169,13 @@ class MyMainWidget(QtW.QWidget, logging.Handler):
         dataset = item.data(256)  # type: DataSet
         self.ui.lw_channels.clear()
         self.ui.lw_channelnrs.clear()
-        for i, chname in enumerate(dataset.channelnames):
-            nameitem = QtW.QListWidgetItem(chname)
+        for channel in dataset.channels:
+            nameitem = QtW.QListWidgetItem(str(channel))
             nameitem.setFlags(nameitem.flags() | QtC.Qt.ItemFlag.ItemIsEditable)
             self.ui.lw_channels.addItem(nameitem)
-            nritem = QtW.QListWidgetItem(f"{i + 1}")
+            nritem = QtW.QListWidgetItem(f"{channel.index}")
+            color = QColor(0, 255, 0, 127) if channel else QColor(255, 0, 0, 127)
+            nritem.setBackground(color)
             self.ui.lw_channelnrs.addItem(nritem)
 
     def channelchanged(self, item: QtW.QListWidgetItem):
@@ -116,19 +185,22 @@ class MyMainWidget(QtW.QWidget, logging.Handler):
             self.ui.lw_datasets.currentRow()
         ).data(256)
         channelindex = self.ui.lw_channels.currentRow()
-        if item.text():
-            currentdataset.channelnames[channelindex] = item.text()
-        else:
-            currentdataset.channelnames[channelindex] = "--"
+        self.logger.info(f"Channel {channelindex + 1} changed to {item.text()}")
+        currentdataset.setchannelname(str(item.text()), channelindex + 1)
+        self.datasetclicked(self.ui.lw_datasets.item(self.ui.lw_datasets.currentRow()))
 
     def setin(self):
         file = QtW.QFileDialog.getOpenFileName(
             self, "Set Zip File", str(self.current_dir), "*.zip"
         )
         if not file[0]:
+            self.logger.warning("No ZipFile Selected...")
             return
         pth = Path(file[0])
-        if pth.exists():
+        self._setin(pth)
+
+    def _setin(self, pth: Path):
+        if pth.exists() and pth.suffix == ".zip":
             self.current_dir = pth.parent
             self.isz.loadfile(pth)
             self.ui.l_filein.setText(str(self.isz))
@@ -139,21 +211,14 @@ class MyMainWidget(QtW.QWidget, logging.Handler):
                 newitem.setData(256, self.isz.datasets[x])
                 self.ui.lw_datasets.addItem(newitem)
             self.ui.lw_datasets.sortItems()
+            self._setcurrentdir(pth.parent)
+            self.updateui()
         else:
-            print("ERROR")
-        self.updateui()
+            self.logger.error(f"Cannot load {pth}")
 
     def updateui(self):
         self.ui.lw_datasets.update()
         self.ui.lw_channels.update()
-
-    def emit(self, record: logging.LogRecord):
-        msg = self.format(record)
-        self.ui.pte_log.appendPlainText(msg)
-        self.ui.pte_log.update()
-
-    def closeEvent(self, event):
-        self.logger.removeHandler(self.logger.handlers[0])
 
 
 def main():
