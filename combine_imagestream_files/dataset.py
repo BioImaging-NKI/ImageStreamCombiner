@@ -1,3 +1,4 @@
+import copy
 from typing import Any
 
 import numpy as np
@@ -35,13 +36,18 @@ class DataSet:
     def __str__(self) -> str:
         return self.name
 
-    def setchannels(self, channelnames: list[str]) -> None:
-        self.channels = [Channel(i + 1, x) for i, x in enumerate(channelnames)]
+    def setchannels(self, channels: list[Channel]) -> None:
+        self.channels = channels
+
+    def getchannels(self) -> list[Channel]:
+        return self.channels
 
     def setchannelname(self, channelname: str, index: int) -> None:
         channel = [x for x in self.channels if x.index == index]
         if len(channel) == 1:
             channel[0].name = channelname
+        else:
+            print(f"WARNING: Found {len(channel)} channels when setting channelname.")
 
     def addfile(self, file: str) -> None:
         nparts = file.split("_")

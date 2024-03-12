@@ -7,7 +7,7 @@ import toml
 from PyQt6.QtCore import QSettings
 from PyQt6.QtGui import QDropEvent, QDragEnterEvent, QDragMoveEvent, QColor
 
-from combine_imagestream_files.dataset import DataSet
+from combine_imagestream_files.dataset import DataSet, Channel
 from combine_imagestream_files.imagestreamzip import ImageStreamZip
 from ui import MainWidget
 from ui.customwidgets import QLogHandler, configure_logging
@@ -113,8 +113,11 @@ class MyMainWidget(QtW.QWidget):
             str(defaultfile),
             "*.toml",
         )
+        channels = {}
+        for x in currentdataset.channels:
+            channels[str(x.index)] = x.name
         if file[0]:
-            tomldata = {"channelnames": [str(x) for x in currentdataset.channels]}
+            tomldata = {"channels": channels}
             with open(file[0], "w") as f:
                 toml.dump(tomldata, f)
 
@@ -145,8 +148,12 @@ class MyMainWidget(QtW.QWidget):
                 256
             )  # type: DataSet
             with open(pth, "r") as f:
-                channelnames = toml.load(f)
-            currentdataset.setchannels(channelnames["channelnames"][:])
+                data = toml.load(f)
+                channels = data['channels']
+            allchannels = []
+            for ch in channels:
+                allchannels.append(Channel(int(ch), channels[ch]))
+            currentdataset.setchannels(allchannels)
             self.datasetclicked(
                 self.ui.lw_datasets.item(self.ui.lw_datasets.currentRow())
             )
@@ -158,10 +165,11 @@ class MyMainWidget(QtW.QWidget):
         currentdataset = self.ui.lw_datasets.item(
             self.ui.lw_datasets.currentRow()
         ).data(256)
+        currentchannels = currentdataset.getchannels()
         for ds_name in self.isz.datasets:
-            self.isz.datasets[ds_name].setchannels(
-                [str(x) for x in currentdataset.channels]
-            )
+            self.isz.datasets[ds_name].channels = []
+            for ch in currentchannels:
+                self.isz.datasets[ds_name].channels.append(Channel(ch.index, ch.name))
 
     def datasetclicked(self, item: QtW.QListWidgetItem):
         if not self.isz:
@@ -185,8 +193,9 @@ class MyMainWidget(QtW.QWidget):
             self.ui.lw_datasets.currentRow()
         ).data(256)
         channelindex = self.ui.lw_channels.currentRow()
-        self.logger.info(f"Channel {channelindex + 1} changed to {item.text()}")
-        currentdataset.setchannelname(str(item.text()), channelindex + 1)
+        channelnr = int(self.ui.lw_channelnrs.item(channelindex).text())
+        self.logger.info(f"Channel {channelnr} changed to {item.text()}")
+        currentdataset.setchannelname(str(item.text()), channelnr)
         self.datasetclicked(self.ui.lw_datasets.item(self.ui.lw_datasets.currentRow()))
 
     def setin(self):
