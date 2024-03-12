@@ -149,7 +149,7 @@ class MyMainWidget(QtW.QWidget):
             )  # type: DataSet
             with open(pth, "r") as f:
                 data = toml.load(f)
-                channels = data['channels']
+                channels = data["channels"]
             allchannels = []
             for ch in channels:
                 allchannels.append(Channel(int(ch), channels[ch]))

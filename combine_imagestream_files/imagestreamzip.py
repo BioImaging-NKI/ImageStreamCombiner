@@ -66,7 +66,9 @@ class ImageStreamZip:
                 for i, file in enumerate(dataset.groupedfiles):  # Each cell
                     for j, channel in enumerate(channels):  # Each channel
                         with TiffFile(
-                                archive.open(f"{dataset}/{file}_Ch{channel.index}{self.suffix}")
+                            archive.open(
+                                f"{dataset}/{file}_Ch{channel.index}{self.suffix}"
+                            )
                         ) as tfile:
                             page = tfile.pages[0]
                             if checkdatatype:
@@ -96,7 +98,9 @@ class ImageStreamZip:
                 for i, file in enumerate(dataset.groupedfiles):
                     for j, channel in enumerate(channels):
                         with TiffFile(
-                            archive.open(f"{dataset}/{file}_Ch{channel.index}{self.suffix}")
+                            archive.open(
+                                f"{dataset}/{file}_Ch{channel.index}{self.suffix}"
+                            )
                         ) as tfile:
                             page = tfile.pages[0]
                             data[i, j, :, :] = dataset.medians[j]

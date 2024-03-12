@@ -42,6 +42,9 @@ class DataSet:
     def getchannels(self) -> list[Channel]:
         return self.channels
 
+    def getvalidchannels(self) -> list[Channel]:
+        return [x for x in self.channels if x]
+
     def setchannelname(self, channelname: str, index: int) -> None:
         channel = [x for x in self.channels if x.index == index]
         if len(channel) == 1:
@@ -77,12 +80,6 @@ class DataSet:
                 print(f"{k} only has {self.groupedfiles[k]}")
                 allexist = False
         return allexist
-
-    def getvalidchannels(self) -> list[Channel]:
-        return [x for x in self.channels if x]
-
-    def getchannels(self) -> list[Channel]:
-        return [x for x in self.channels]
 
     def getnchannels(self) -> int:
         return len(self.getchannels())
