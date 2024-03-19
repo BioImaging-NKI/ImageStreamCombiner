@@ -27,6 +27,10 @@ class ImageStreamZip:
                 if file[-1] == r"/":  # it is a folder
                     pass
                 else:
+                    if (
+                        len(file.split(r"/")) != 2
+                    ):  # File is not in a subfolder of the root. Ignore.
+                        continue
                     (folder, name) = file.split(r"/")
                     if name.endswith(self.suffix):
                         if folder not in self.datasets:
@@ -51,6 +55,7 @@ class ImageStreamZip:
                 dataset = self.datasets[datasetname]
                 channels = dataset.getvalidchannels()
                 if len(channels) == 0:
+                    logger.warning(f"No valid channels for {datasetname}")
                     continue
                 # Getting Median/Size/datatype
                 mw = 0

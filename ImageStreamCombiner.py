@@ -222,6 +222,10 @@ class MyMainWidget(QtW.QWidget):
             self.ui.lw_datasets.sortItems()
             self._setcurrentdir(pth.parent)
             self.updateui()
+            if len(self.isz.datasets) == 0:
+                self.logger.warning(
+                    "Did not find any datasets in this zipfile. Are the files in subfolders?"
+                )
         else:
             self.logger.error(f"Cannot load {pth}")
 
