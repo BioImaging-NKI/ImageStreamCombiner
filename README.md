@@ -10,4 +10,4 @@
 
 ## Building
 * `pyi-makespec main_ui.py`
-* `pyinstaller main_ui.spec`
+* `pyinstaller ImageStreamCombiner.spec`

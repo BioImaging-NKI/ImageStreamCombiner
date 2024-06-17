@@ -28,7 +28,7 @@ class ImageStreamZip:
                     pass
                 else:
                     if (
-                        len(file.split(r"/")) != 2
+                            len(file.split(r"/")) != 2
                     ):  # File is not in a subfolder of the root. Ignore.
                         continue
                     (folder, name) = file.split(r"/")
@@ -36,17 +36,17 @@ class ImageStreamZip:
                         if folder not in self.datasets:
                             self.datasets[folder] = DataSet(folder)
                         self.datasets[folder].addfile(
-                            name[0 : len(name) - len(self.suffix)]
+                            name[0: len(name) - len(self.suffix)]
                         )
             for d in self.datasets:
                 self.datasets[d].sort()
             self.loaded = True
 
     def writetiffs(
-        self,
-        folder: Path | str,
-        pixelsize: float,
-        logger: logging.Logger = logging.getLogger("isz"),
+            self,
+            folder: Path | str,
+            pixelsize: float,
+            logger: logging.Logger = logging.getLogger("isz"),
     ) -> None:
         logger.info(f"Writing tiffile for {self}")
         with ZipFile(self.zipfile, "r") as archive:
@@ -68,12 +68,21 @@ class ImageStreamZip:
                     logging.ERROR
                 )  # otherwise you get many "FILLORDER" errors.
                 checkdatatype = True
+                clearfiles = []
                 for i, file in enumerate(dataset.groupedfiles):  # Each cell
+                    skipfile = False
+                    for j, channel in enumerate(channels):  # Each channel
+                        if channel.index not in dataset.groupedfiles[file]:
+                            logger.error(f"{file} does not have {channel.index}. Skipping file.")
+                            skipfile = True
+                    if skipfile:
+                        clearfiles.append(file)
+                        continue
                     for j, channel in enumerate(channels):  # Each channel
                         with TiffFile(
-                            archive.open(
-                                f"{dataset}/{file}_Ch{channel.index}{self.suffix}"
-                            )
+                                archive.open(
+                                    f"{dataset}/{file}_Ch{channel.index}{self.suffix}"
+                                )
                         ) as tfile:
                             page = tfile.pages[0]
                             if checkdatatype:
@@ -84,6 +93,8 @@ class ImageStreamZip:
                             if page.shape[1] > mh:
                                 mh = page.shape[1]
                             medians[i, j] = np.median(page.asarray())
+                for clearfile in clearfiles:
+                    del dataset.groupedfiles[clearfile]
                 dataset.medians = np.median(medians, axis=0)
                 dataset.size = (mw, mh)
 
@@ -103,9 +114,9 @@ class ImageStreamZip:
                 for i, file in enumerate(dataset.groupedfiles):
                     for j, channel in enumerate(channels):
                         with TiffFile(
-                            archive.open(
-                                f"{dataset}/{file}_Ch{channel.index}{self.suffix}"
-                            )
+                                archive.open(
+                                    f"{dataset}/{file}_Ch{channel.index}{self.suffix}"
+                                )
                         ) as tfile:
                             page = tfile.pages[0]
                             data[i, j, :, :] = dataset.medians[j]
@@ -113,7 +124,7 @@ class ImageStreamZip:
                             h = page.shape[1]
                             offsetx = (dataset.size[0] - w) // 2
                             offsety = (dataset.size[1] - h) // 2
-                            data[i, j, offsetx : offsetx + w, offsety : offsety + h] = (
+                            data[i, j, offsetx: offsetx + w, offsety: offsety + h] = (
                                 page.asarray()
                             )
 
