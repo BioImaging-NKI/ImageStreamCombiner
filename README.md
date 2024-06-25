@@ -1,10 +1,9 @@
 # Combine ImageStream Files
 
 ## Installation
-### plain
+### for usage
 `pip install -e .`
-### with gui
-`pip install -e .[ui]`
+
 ### for development
 `pip install -e .[dev]`
 

@@ -18,4 +18,4 @@ jobs:
       - name: Install dependencies
         run: pip install mypy
       - name: MyPy test typing
-        run: mypy
+        run: mypy numpy tifffile pandas-stubs

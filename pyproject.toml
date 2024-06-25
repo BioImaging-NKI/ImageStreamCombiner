@@ -19,11 +19,11 @@ dependencies = [
     "tifffile",
     "numpy",
     "imagecodecs",
+    "PyQt6"
 ]
 requires-python = ">=3.11"
 [project.optional-dependencies]
 dev = ["black", "mypy", "pytest", "bumpver", "pandas-stubs", "pyinstaller"]
-ui = ["PyQt6"]
 
 [tool.black]
 line-length = 88
