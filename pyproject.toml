@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "combine_imagestream_files"
-version = "1.0.0"
+version = "0.0.1"
 description = "combine imagestream files"
 readme = "readme.md"
 authors = [{ name = "Rolf Harkes", email = "r.harkes@nki.nl" }]
@@ -38,3 +38,20 @@ pythonpath = [
 python_version = '3.11'
 packages = "combine_imagestream_files"
 strict = true
+
+[tool.bumpver]
+current_version = "0.0.1"
+version_pattern = "MAJOR.MINOR.PATCH"
+commit_message = "bump version {old_version} -> {new_version}"
+commit = true
+tag = true
+push = true
+
+[tool.bumpver.file_patterns]
+"pyproject.toml" = [
+    'current_version = "{version}"',
+    'version = "{version}"',
+]
+"combine_imagestream_files/version.py" = [
+    "{version}"
+]
