@@ -25,7 +25,7 @@ requires-python = ">=3.11"
 dev = ["black", "mypy", "pytest", "bumpver", "pandas-stubs", "pyinstaller"]
 
 [project.scripts]
-tmeanalyzer = "combine_imagestream_files:main"
+combine_imagestream_files = "combine_imagestream_files:main"
 
 [tool.black]
 line-length = 88
@@ -38,6 +38,7 @@ pythonpath = [
 
 [tool.mypy]
 python_version = '3.11'
+mypy_path = "src"
 packages = "combine_imagestream_files"
 strict = true
 
@@ -54,6 +55,6 @@ push = true
     'current_version = "{version}"',
     'version = "{version}"',
 ]
-"combine_imagestream_files/version.py" = [
+"src/combine_imagestream_files/version.py" = [
     "{version}"
 ]
