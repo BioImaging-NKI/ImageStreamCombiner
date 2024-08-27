@@ -1,7 +1,7 @@
 import argparse
 from pathlib import Path
 import logging
-from combine_imagestream_files import ImageStreamZip
+from .imagestreamzip import ImageStreamZip
 
 
 def get_args() -> argparse.Namespace:
@@ -33,7 +33,7 @@ def get_args() -> argparse.Namespace:
     return myparser.parse_args()
 
 
-if __name__ == "__main__":
+def main() -> None:
     args = get_args()
     loglevels = [logging.ERROR, logging.WARNING, logging.INFO]
     loglevel = loglevels[int(args.l)]
@@ -41,10 +41,13 @@ if __name__ == "__main__":
     logging.info("Arguments parsed")
     logging.info(f"Loglevel: {logging.getLevelName(loglevel)}")
     zipin = Path(args.i)
-    runit = False
     if not zipin.exists() or not zipin.is_file():
         print(f"Cannot find zipfile: {args.i}")
     else:
         isz = ImageStreamZip()
         isz.loadfile(zipin)
         isz.writetiffs(zipin.parent, args.p)
+
+
+if __name__ == "__main__":
+    main()

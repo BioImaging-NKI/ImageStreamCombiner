@@ -25,6 +25,9 @@ requires-python = ">=3.11"
 [project.optional-dependencies]
 dev = ["black", "mypy", "pytest", "bumpver", "pandas-stubs", "pyinstaller"]
 
+[project.scripts]
+tmeanalyzer = "combine_imagestream_files:main"
+
 [tool.black]
 line-length = 88
 target-version = ['py39', 'py310', 'py311']
