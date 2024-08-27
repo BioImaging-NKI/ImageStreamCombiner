@@ -8,7 +8,7 @@
 ## Usage (commandline interface)
 * Clone or download the repository
 * `pip install -e .`
-* `combine_imagestream_files`
+* `combine_imagestream_files -h`
 
 ## Building
 * `pip install -e .[dev]`
