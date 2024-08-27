@@ -3,7 +3,7 @@
 # Combine ImageStream Files
 
 ## Usage (with user interface)
-* Download from [release](/releases)
+* Download from [release](https://github.com/BioImaging-NKI/ImageStreamCombiner/releases)
 
 ## Usage (commandline interface)
 * Clone or download the repository

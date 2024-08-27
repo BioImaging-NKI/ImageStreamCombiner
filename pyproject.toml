@@ -15,7 +15,6 @@ classifiers = [
 ]
 keywords = ["ImageStream"]
 dependencies = [
-    "pandas",
     "tifffile",
     "numpy",
     "imagecodecs",
