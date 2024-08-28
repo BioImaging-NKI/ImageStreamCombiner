@@ -4,7 +4,9 @@
 
 ## Usage (with user interface)
 * Download from [release](https://github.com/BioImaging-NKI/ImageStreamCombiner/releases)
+
 or
+
 * Install: `pip install -e .[gui]`
 * [Generate ui](/ui)
 * Run: `python ImageStreamCombiner.py`
