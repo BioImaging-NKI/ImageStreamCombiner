@@ -18,5 +18,6 @@ or
 
 ## Building
 * `pip install -e .[dev]`
+* [Generate ui](/ui)
 * `pyi-makespec ImageStreamCombiner.py`
 * `pyinstaller ImageStreamCombiner.spec`
