@@ -18,11 +18,11 @@ dependencies = [
     "tifffile",
     "numpy",
     "imagecodecs",
-    "PyQt6"
 ]
 requires-python = ">=3.11"
 [project.optional-dependencies]
-dev = ["black", "mypy", "pytest", "bumpver", "pandas-stubs", "pyinstaller"]
+dev = ["PyQt6", "black", "mypy", "bumpver", "pandas-stubs", "pyinstaller"]
+gui = ["PyQt6"]
 
 [project.scripts]
 combine_imagestream_files = "combine_imagestream_files:main"
