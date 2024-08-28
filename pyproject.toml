@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "combine_imagestream_files"
-version = "1.0.0"
+version = "1.0.1"
 description = "combine imagestream files"
 readme = "readme.md"
 authors = [{ name = "Rolf Harkes", email = "r.harkes@nki.nl" }]
@@ -43,7 +43,7 @@ packages = "combine_imagestream_files"
 strict = true
 
 [tool.bumpver]
-current_version = "1.0.0"
+current_version = "1.0.1"
 version_pattern = "MAJOR.MINOR.PATCH"
 commit_message = "bump version {old_version} -> {new_version}"
 commit = true
