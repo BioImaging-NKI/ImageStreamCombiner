@@ -1,11 +1,11 @@
 import logging
 import sys
 from pathlib import Path
-from PyQt6 import QtWidgets as QtW
-from PyQt6 import QtCore as QtC
+from PySide6 import QtWidgets as QtW
+from PySide6 import QtCore as QtC
 import toml
-from PyQt6.QtCore import QSettings
-from PyQt6.QtGui import QDropEvent, QDragEnterEvent, QDragMoveEvent, QColor
+from PySide6.QtCore import QSettings
+from PySide6.QtGui import QDropEvent, QDragEnterEvent, QDragMoveEvent, QColor
 
 from combine_imagestream_files.dataset import DataSet, Channel
 from combine_imagestream_files.imagestreamzip import ImageStreamZip

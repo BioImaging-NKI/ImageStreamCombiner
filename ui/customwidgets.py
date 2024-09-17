@@ -1,13 +1,13 @@
 import logging
-from PyQt6 import QtCore, QtWidgets
+from PySide6 import QtCore, QtWidgets
 
 
 class QTextEditLogger(QtWidgets.QPlainTextEdit):
-    log = QtCore.pyqtSignal(str)
+    log = QtCore.Signal(str)
 
     def __init__(self, parent):
         super().__init__()
-        QtCore.QObject.__init__(self)
+        # QtCore.QObject.__init__(self)
         self.setReadOnly(True)
         self.log.connect(self.myAppendPlainText)
 

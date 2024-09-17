@@ -7,17 +7,21 @@
 
 or
 
-* Install: `pip install -e .[gui]`
+* Install: `pip install .[gui]`
 * [Generate ui](/ui)
 * Run: `python ImageStreamCombiner.py`
 
 ## Usage (commandline interface)
 * Clone or download the repository
-* `pip install -e .`
+* `pip install .`
 * `combine_imagestream_files -h`
 
-## Building
-* `pip install -e .[dev]`
+## Building standalone executable
+* `pip install .[build]`
 * [Generate ui](/ui)
 * `pyi-makespec ImageStreamCombiner.py`
 * `pyinstaller ImageStreamCombiner.spec`
+
+## Editable install
+* `pip install meson-python meson ninja`
+* `pip install --no-build-isolation --editable .[dev]`
