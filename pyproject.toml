@@ -6,7 +6,7 @@ requires = ['meson-python']
 name = "combine_imagestream_files"
 version = "1.0.2"
 description = "combine imagestream files"
-readme = "readme.md"
+readme = "README.md"
 authors = [{ name = "Rolf Harkes", email = "r.harkes@nki.nl" }]
 classifiers = [
     "License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)",
