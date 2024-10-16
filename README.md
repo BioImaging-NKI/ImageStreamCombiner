@@ -29,7 +29,7 @@ First choose a zip-file, or drop one on the window. ([example](demofiles/Demo.zi
 
 Set the channel names of the channels that need to be exported. This can be done either by:
 * Typing in the list
-* Loading a .toml file ([example](demofiles/Arctic_Conditions.toml)) 
+* Loading a .toml file ([example](demofiles/Arctic_Conditions.toml)). A .toml file can also be dropped on the window.
 Once set the channel names can also be saved to .toml. If all datasets have the same channel names the button "ToAllDatasets" copies the current channel names to all datasets.
 
 <img src="images/ChannelsSet.png" width="640">
