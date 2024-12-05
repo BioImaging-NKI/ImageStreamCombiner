@@ -1,7 +1,7 @@
 [![Mypy](https://github.com/BioImaging-NKI/ImageStreamCombiner/actions/workflows/mypy.yml/badge.svg)](https://github.com/BioImaging-NKI/ImageStreamCombiner/actions/workflows/mypy.yml)
 [![Black](https://github.com/BioImaging-NKI/ImageStreamCombiner/actions/workflows/black.yml/badge.svg)](https://github.com/BioImaging-NKI/ImageStreamCombiner/actions/workflows/black.yml)
 # Combine ImageStream Files
-Software to combine many small .tiff files from the [ImageStream](https://cytekbio.com/pages/imagestream) into a single .tiff for analysis in [FIJI](https://fiji.sc/).
+Software to combine many small .tiff files from the [ImageStream](https://cytekbio.com/pages/imagestream) into a single .tiff for analysis in [FIJI](https://fiji.sc/). For further analysis of ImageStream images, see our [ImageStreamAnalysis](https://github.com/BioImaging-NKI/ImageStreamAnalysis) repository.
 ## Installation
 ### With user interface
 * Download from [release](https://github.com/BioImaging-NKI/ImageStreamCombiner/releases)
