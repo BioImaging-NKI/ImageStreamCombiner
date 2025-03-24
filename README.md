@@ -4,7 +4,7 @@
 Software to combine many small .tiff files from the [ImageStream](https://cytekbio.com/pages/imagestream) into a single .tiff for analysis in [FIJI](https://fiji.sc/). For further analysis of ImageStream images, see our [ImageStreamAnalysis](https://github.com/BioImaging-NKI/ImageStreamAnalysis) repository.
 ## Installation
 ### With user interface
-* Download from [release](https://github.com/BioImaging-NKI/ImageStreamCombiner/releases)
+* Download from [release](https://github.com/BioImaging-NKI/ImageStreamCombiner/releases) (Support for windows or linux.)
 
 or
 
